@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Financial Calculator</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f5f7fa;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    background:white;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 0 20px rgba(0,0,0,0.08);
+}
+
+.main-title{
+    text-align:center;
+    font-size:42px;
+    color:#003b7a;
+    font-weight:bold;
+    margin-bottom:40px;
+}
+
+.goal-heading{
+    text-align:center;
+    color:#003b7a;
+    font-size:30px;
+    font-weight:bold;
+    line-height:1.6;
+    margin-bottom:30px;
+}
+
+.inline-input{
+    width:220px;
+    padding:14px;
+    font-size:22px;
+    border:1px solid #ccc;
+    border-radius:10px;
+    text-align:center;
+}
+
+.calculate-btn{
+    width:100%;
+    background:#003b7a;
+    color:white;
+    border:none;
+    padding:18px;
+    font-size:22px;
+    border-radius:10px;
+    margin-top:25px;
+    cursor:pointer;
+}
+
+.calculate-btn:hover{
+    background:#0050a0;
+}
+
+.results{
+    display:none;
+    margin-top:35px;
+}
+
+.results-grid{
+    display:flex;
+    gap:30px;
+    flex-wrap:wrap;
+}
+
+.result-card{
+    flex:1;
+    min-width:450px;
+    background:#eef3fb;
+    padding:30px;
+    border-radius:15px;
+}
+
+.section-title{
+    color:#003b7a;
+    font-size:26px;
+    border-bottom:1px solid #d0d0d0;
+    padding-bottom:12px;
+    margin-bottom:20px;
+}
+
+.result-row{
+    font-size:20px;
+    margin:30px 0;
+    line-height:1.8;
+}
+
+.value{
+    color:green;
+    font-weight:bold;
+}
+
+.cagr-note{
+    color:#666;
+    font-size:16px;
+    font-style:italic;
+}
+
+.message-box{
+    margin-top:40px;
+    border:2px dashed #4ea02f;
+    border-radius:15px;
+    background:#f8fff5;
+    padding:30px;
+    text-align:center;
+}
+
+.message-title{
+    color:#198c19;
+    font-size:32px;
+    font-weight:bold;
+    text-transform:uppercase;
+    margin-bottom:15px;
+}
+
+.message-subtitle{
+    font-size:24px;
+    color:#333;
+    font-weight:500;
+}
+
+.footer{
+    text-align:center;
+    margin-top:30px;
+    color:#666;
+    font-size:14px;
+}
+
+@media(max-width:900px){
+
+.result-card{
+    min-width:100%;
+}
+
+.goal-heading{
+    font-size:24px;
+}
+
+.inline-input{
+    width:150px;
+    margin-top:10px;
+}
+
+.main-title{
+    font-size:32px;
+}
+
+.message-title{
+    font-size:26px;
+}
+
+.message-subtitle{
+    font-size:20px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="main-title">
+        FINANCIAL CALCULATOR
+    </div>
+
+    <div class="goal-heading">
+
+        How much to invest TODAY to create a corpus of
+
+        <input
+            type="number"
+            id="goalAmount"
+            class="inline-input"
+            placeholder="₹ Amount">
+
+        in
+
+        <input
+            type="number"
+            id="years"
+            class="inline-input"
+            placeholder="Years">
+
+        years?
+
+    </div>
+
+    <button class="calculate-btn" onclick="calculate()">
+        Calculate
+    </button>
+
+    <div class="results" id="results">
+
+        <div class="results-grid">
+
+            <!-- LEFT SIDE -->
+
+            <div class="result-card">
+
+                <div class="section-title">
+                    One Time Investment TODAY
+                </div>
+
+                <div class="result-row">
+                    If you choose to invest through Mutual Fund:
+                    <br>
+                    <span class="cagr-note">(Assuming 12% CAGR)</span>
+                    <br>
+                    <span class="value" id="lumpsum12"></span>
+                </div>
+
+                <div class="result-row">
+                    If you choose to invest through Bank Fixed Deposit:
+                    <br>
+                    <span class="value" id="fd65"></span>
+                </div>
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+
+            <div class="result-card">
+
+                <div class="section-title">
+                    Monthly Investment (SIP or Recurring Deposit)
+                </div>
+
+                <div class="result-row">
+                    If you choose to invest monthly in Mutual Fund (SIP):
+                    <br>
+                    <span class="cagr-note">(Assuming 12% CAGR)</span>
+                    <br>
+                    <span class="value" id="sip12"></span>
+                </div>
+
+                <div class="result-row">
+                    If you choose to invest in Bank Recurring Deposit:
+                    <br>
+                    <span class="value" id="rd65"></span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="message-box">
+
+        <div class="message-title">
+            INVEST LESSER TO CREATE MORE CORPUS
+        </div>
+
+        <div class="message-subtitle">
+            It's important to choose the right vehicle for a smoother journey.
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Figures shown are illustrative and based on assumed rates of return.
+        Actual returns may vary.
+    </div>
+
+</div>
+
+<script>
+
+function formatIndian(number){
+
+    return number.toLocaleString('en-IN',{
+        maximumFractionDigits:0
+    });
+
+}
+
+function calculate(){
+
+    let goalAmount =
+        parseFloat(document.getElementById("goalAmount").value);
+
+    let years =
+        parseFloat(document.getElementById("years").value);
+
+    if(!goalAmount || !years){
+
+        alert("Please enter the goal amount and time horizon.");
+
+        return;
+    }
+
+    let months = years * 12;
+
+    let lumpsum12 =
+        goalAmount / Math.pow(1.12, years);
+
+    let fd65 =
+        goalAmount / Math.pow(1.065, years);
+
+    let monthlyRate12 = 0.12 / 12;
+
+    let sip12 =
+        goalAmount *
+        monthlyRate12 /
+        (Math.pow(1 + monthlyRate12, months) - 1);
+
+    let monthlyRate65 = 0.065 / 12;
+
+    let rd65 =
+        goalAmount *
+        monthlyRate65 /
+        (Math.pow(1 + monthlyRate65, months) - 1);
+
+    document.getElementById("lumpsum12").innerHTML =
+        "₹ " + formatIndian(lumpsum12);
+
+    document.getElementById("fd65").innerHTML =
+        "₹ " + formatIndian(fd65);
+
+    document.getElementById("sip12").innerHTML =
+        "₹ " + formatIndian(sip12);
+
+    document.getElementById("rd65").innerHTML =
+        "₹ " + formatIndian(rd65);
+
+    document.getElementById("results").style.display = "block";
+}
+
+</script>
+
+</body>
+</html>
